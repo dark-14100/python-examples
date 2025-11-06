@@ -1,0 +1,5 @@
+Python is an amazing programming language.
+It is widely used in data science and AI.
+File handling allows reading and writing data easily.
+Practice makes perfect in Python programming.
+Keep learning and exploring new libraries.
