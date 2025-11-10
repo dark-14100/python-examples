@@ -94,7 +94,7 @@ y=list(cls)
 
 x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(x, y, test_size=0.1)
 
-model = KNeighborsClassifier(n_neighbors=9) # Created the model with k=5
+model = KNeighborsClassifier(n_neighbors=5) # Created the model with k=5
 model.fit(x_train,y_train) # Training the model
 accuracy=model.score(x_test,y_test) # Returns the accuracy of the best fit line 
 print(accuracy) 
@@ -106,4 +106,30 @@ for x in range(len(predictions)):
     print(names[predictions[x]],x_test[x],names[y_test[x]]) # Predicted data,all attributes,actual data
     n=model.kneighbors([x_test[x]],9,True) # We're putting double brackets cos the function doesn't know how to look data which is not 2D
     print("N:",n)
+
+# Saving the model
+'''with open("cardata.pickle","wb") as f: 
+    pickle.dump(model,f)
+model=pickle.load(open("cardata.pickle","rb")) # Loading the model into an object'''
+# %% Classification - SVM
+import sklearn
+from sklearn import datasets
+from sklearn import svm
+from sklearn import metrics
+from sklearn import KNeighborsClassifier
+
+cancer = datasets.load_breast_cancer() # Loading in a built in dataset
+
+print(cancer.feature_names) # Feature names
+print(cancer.target_names) # Target names i.e. the thing we'll predict
+
+x = cancer.data
+y = cancer.target
+
+x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(x, y, test_size=0.2)
+
+classes=["malignant","benign"]
+
+
+
 # %%
