@@ -1,3 +1,4 @@
+# SUPERWISED DATA
 # %% Creating a LINEAR REGRESSION model
 import pandas as pd
 import numpy as np
@@ -116,7 +117,8 @@ import sklearn
 from sklearn import datasets
 from sklearn import svm
 from sklearn import metrics
-from sklearn import KNeighborsClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
 
 cancer = datasets.load_breast_cancer() # Loading in a built in dataset
 
@@ -130,6 +132,63 @@ x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(x, y
 
 classes=["malignant","benign"]
 
+clf=svm.SVC(kernel="linear") # We can use poly for more accurate results, but then it takes way too long to run. We can try changing the degree instead
+clf_2=svm.SVC(kernel="poly",degree=4) # New model with a poly of degree 4
+clf_3=svm.SVC(kernel="linear",C=2) # C is the soft margin param. Defaulted to 1. C=0 for hard margin.
 
+clf.fit(x_train,y_train)
+clf_2.fit(x_train,y_train)
+clf_3.fit(x_train,y_train)
+
+y_pred=clf.predict(x_test)
+y_pred_2=clf_2.predict(x_test)
+y_pred_3=clf_3.predict(x_test)
+
+accuracy1=metrics.accuracy_score(y_test,y_pred)
+accuracy2=metrics.accuracy_score(y_test,y_pred_2)
+accuracy3=metrics.accuracy_score(y_test,y_pred_3)
+
+print("Accuracy 1: ",accuracy1)
+print("Accuracy 2: ",accuracy2) # Adding the degree param here adds more complexity. We have a dataset which can easily be divided by a linear hyperplane, that's why the accuracy drops.
+print("Accuracy 3: ",accuracy3) # Again, data is evenly divided, hence the doubling the soft margin doesn't do much
+ 
+# Does using KNearestNeighbors make a difference?
+clf_k=KNeighborsClassifier(n_neighbors=9)
+clf_k.fit(x_train,y_train)
+y_pred_k=clf_k.predict(x_test)
+accuracy_k=metrics.accuracy_score(y_test,y_pred_k)
+print("Accuracy K: ",accuracy_k)
+
+# %% UNSUPERWISED DATA
+# K Means Clustering
+import numpy as np
+import sklearn
+from sklearn.preprocessing import scale
+from sklearn.datasets import load_digits # Our builtin dataset
+from sklearn.cluster import KMeans
+from sklearn import metrics
+
+digits=load_digits() # Loading the data
+data=scale(digits.data) # We're scaling down our data so that all the values are between -1 and 1
+y=digits.target # Our labels
+k=len(np.unique(y)) # Dynamic way of finding the number of clusters
+
+samples,features=data.shape # Samples = number of rows, Features = number of columns
+
+# We could manually score and fit the data, but then sklearn's sourcecode already has a better way to do that so we'll just use that
+def bench_k_means(estimator, name, data):
+    estimator.fit(data)
+    print('%-9s\t%i\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f'
+          % (name, estimator.inertia_,
+             metrics.homogeneity_score(y, estimator.labels_),
+             metrics.completeness_score(y, estimator.labels_),
+             metrics.v_measure_score(y, estimator.labels_),
+             metrics.adjusted_rand_score(y, estimator.labels_),
+             metrics.adjusted_mutual_info_score(y,  estimator.labels_),
+             metrics.silhouette_score(data, estimator.labels_,
+                                      metric='euclidean')))
+
+clf=KMeans(n_clusters=k,init="k-means++",n_init=10) # Read about the params here: https://scikit-learn.org/stable/modules/clustering.html#clustering-evaluation
+bench_k_means(clf,"1",data) # (classifier,name,data)
 
 # %%
